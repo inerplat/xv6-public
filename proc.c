@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "processInfo.h"
 
 struct {
   struct spinlock lock;
@@ -342,7 +343,7 @@ scheduler(void)
       c->proc = p;
       switchuvm(p);
       p->state = RUNNING;
-
+      p->swcnt++;
       swtch(&(c->scheduler), p->context);
       switchkvm();
 
@@ -529,6 +530,42 @@ procdump(void)
       for(i=0; i<10 && pc[i] != 0; i++)
         cprintf(" %p", pc[i]);
     }
+    cprintf("\n");
+  }
+}
+
+int
+getActiveProcNum(void)
+{
+  struct proc *p;
+  int cnt = 0;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state == UNUSED)
+      continue;
+    ++cnt;
+  }
+  return cnt;
+}
+
+int
+getMaxPID(void)
+{
+  struct proc *p;
+  int max = -1;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    max = max < p->pid ? p->pid : max;
+  return max;
+}
+
+void
+getProcInfo(void)
+{
+  struct proc *p;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state == UNUSED) continue;
+    cprintf("%d %d %d", p->pid, (p->pid == 1 ? 0 : p->parent->pid), p->sz);
+    cprintf("\n");
+    cprintf("%d", p->swcnt);
     cprintf("\n");
   }
 }

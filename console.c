@@ -91,6 +91,9 @@ cprintf(char *fmt, ...)
     case '%':
       consputc('%');
       break;
+    case 'u':
+      printint(*argp++, 10, 0);
+      break;
     default:
       // Print unknown % sequence to draw attention.
       consputc('%');

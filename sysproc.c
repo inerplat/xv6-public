@@ -89,3 +89,33 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int
+sys_hello(void){
+  cprintf("helloxv6\n");
+  return 1;
+}
+
+int 
+sys_hello_name(void){
+  char *path;
+  if(argstr(0, &path) < 0){
+    return -1;
+  }
+  cprintf("%s\n", path);
+  return 1;
+}
+
+int 
+sys_get_num_proc(void){
+  return getActiveProcNum();
+}
+
+int sys_get_max_pid(void){
+  return getMaxPID();
+}
+
+int sys_get_proc_info(void){
+  getProcInfo();
+  return 1;
+}
